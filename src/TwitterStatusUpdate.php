@@ -45,6 +45,23 @@ class TwitterStatusUpdate extends TwitterMessage
     }
 
     /**
+     * Set Twitter media files with alt text.
+     *
+     * @return $this
+     */
+    public function withImageAndAlt(array|string $images, array|string $alts): static
+    {
+        $images = is_array($images) ? $images : [$images];
+        $alts = is_array($alts) ? $alts : [$alts];
+
+        collect($images)->each(function ($image, $key) use ($alts) {
+            $this->images[] = new TwitterImage($image, $alts[$key]);
+        });
+
+        return $this;
+    }
+
+    /**
      * Get Twitter images list.
      */
     public function getImages(): ?array

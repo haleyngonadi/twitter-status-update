@@ -70,6 +70,23 @@ class TwitterChannel
             $twitterMessage->imageIds = collect($twitterMessage->getImages())->map(function (TwitterImage $image) {
                 $media = $this->twitter->upload('media/upload', ['media' => $image->getPath()]);
 
+                /** Accesiblity: Add alt text to images if available.
+                 * https://github.com/abraham/twitteroauth/issues/954#issuecomment-974870119
+                 */
+
+                if ($image->getAlt() !== '') {
+                    $this->twitter->post(
+                        'media/metadata/create',
+                        [
+                            'media_id' => $media->media_id_string,
+                            'alt_text' => [
+                                'text' => $image->getAlt(),
+                            ]
+                        ],
+                        true
+                    );
+                }
+
                 return $media->media_id_string;
             });
         }
